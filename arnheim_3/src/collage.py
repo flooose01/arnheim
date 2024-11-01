@@ -281,7 +281,8 @@ class CollageMaker():
 
         params = {"gamma": gamma,
                   "max_block_size_high_res": self._config.get(
-                      "max_block_size_high_res")}
+                      "max_block_size_high_res"
+                      ), "final": True}
         if no_background:
             params["no_background"] = True
         with torch.no_grad():

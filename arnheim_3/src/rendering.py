@@ -89,7 +89,7 @@ def population_render_masked_transparency(
     return y.clamp(0., 1.).permute(0, 2, 3, 1)
 
 
-def population_render_overlap(x, invert_colours=False, b=None):
+def population_render_overlap(x, invert_colours=False, b=None, final=False):
     """Render image, overlaying patches on top of one another.
 
     Uses semi-translucent overlap using the alpha chanel as the mask colour
@@ -102,50 +102,51 @@ def population_render_overlap(x, invert_colours=False, b=None):
       Tensor of rendered RGB images of shape [S, 3, H, W].
     """
 
-    # Get the patch mask [S, B, 1, H, W].
-    mask = x[:, :, 3:4, :, :]
-    # Mask the patches [S, B, 4, H, W] -> [S, B, 3, H, W]
-    masked_x = x[:, :, :3, :, :] * mask * mask
-    # Mask the orders [S, B, 1, H, W] -> [S, B, 1, H, W]
-    order = torch.where(
-        mask > RENDER_OVERLAP_MASK_THRESHOLD,
-        x[:, :, 4:, :, :] * mask / RENDER_OVERLAP_TEMPERATURE,
-        mask + RENDER_OVERLAP_ZERO_OFFSET)
-    # Get weights from orders [S, B, 1, H, W]
-    weights = F.softmax(order, dim=1)
-    # Apply weights to masked patches and compute mean over patches [S, 3, H, W].
-    y = (weights * masked_x).sum(1)
-    if invert_colours:
-        y[:, :3, :, :] = 1.0 - y[:, :3, :, :]
-    if b is not None:
-        b = b.cuda() if x.is_cuda else b.cpu()
-        y = torch.where(mask.sum(1) > RENDER_OVERLAP_MASK_THRESHOLD, y[:, :3, :, :],
-                    b.unsqueeze(0)[:, :3, :, :])
-    return y.clamp(0., 1.).permute(0, 2, 3, 1)
+    if not final:
+        # Get the patch mask [S, B, 1, H, W].
+        mask = x[:, :, 3:4, :, :]
+        # Mask the patches [S, B, 4, H, W] -> [S, B, 3, H, W]
+        masked_x = x[:, :, :3, :, :] * mask * mask
+        # Mask the orders [S, B, 1, H, W] -> [S, B, 1, H, W]
+        order = torch.where(
+            mask > RENDER_OVERLAP_MASK_THRESHOLD,
+            x[:, :, 4:, :, :] * mask / RENDER_OVERLAP_TEMPERATURE,
+            mask + RENDER_OVERLAP_ZERO_OFFSET)
+        # Get weights from orders [S, B, 1, H, W]
+        weights = F.softmax(order, dim=1)
+        # Apply weights to masked patches and compute mean over patches [S, 3, H, W].
+        y = (weights * masked_x).sum(1)
+        if invert_colours:
+            y[:, :3, :, :] = 1.0 - y[:, :3, :, :]
+        if b is not None:
+            b = b.cuda() if x.is_cuda else b.cpu()
+            y = torch.where(mask.sum(1) > RENDER_OVERLAP_MASK_THRESHOLD, y[:, :3, :, :],
+                        b.unsqueeze(0)[:, :3, :, :])
+        return y.clamp(0., 1.).permute(0, 2, 3, 1)
 
+    else:
+        
+        S, B, _, H, W = x.shape
 
-    
-    S, B, _, H, W = x.shape
+        mask = x[:, :, 3:4, :, :]
+        # Mask the patches [S, B, 4, H, W] -> [S, B, 3, H, W]
+        masked_x = x[:, :, :3, :, :] * mask * mask
+        # Mask the orders [S, B, 1, H, W] -> [S, B, 1, H, W]
+        order = x[:, :, 4:, :, :] * mask
+        # Get weights from orders [S, B, 1, H, W]
+        weights = torch.zeros((S, B, 1, H, W), device=x.device)
+        max_index = torch.argmax(order, dim=1, keepdim=True)
 
-    mask = x[:, :, 3:4, :, :]
-    # Mask the patches [S, B, 4, H, W] -> [S, B, 3, H, W]
-    masked_x = x[:, :, :3, :, :] * mask * mask
-    # Mask the orders [S, B, 1, H, W] -> [S, B, 1, H, W]
-    order = x[:, :, 4:, :, :] * mask
-    # Get weights from orders [S, B, 1, H, W]
-    weights = torch.zeros((S, B, 1, H, W), device=x.device)
-    max_index = torch.argmax(order, dim=1, keepdim=True)
+        weights.scatter_(1, max_index, 1.0)
 
-    weights.scatter_(1, max_index, 1.0)
+        # Apply weights to masked patches and compute mean over patches [S, 3, H, W].
+        y = (weights * masked_x).sum(1)
 
-    # Apply weights to masked patches and compute mean over patches [S, 3, H, W].
-    y = (weights * masked_x).sum(1)
-
-    if invert_colours:
-        y[:, :3, :, :] = 1.0 - y[:, :3, :, :]
-    if b is not None:
-        b = b.cuda() if x.is_cuda else b.cpu()
-        # TODO: apply background image
-        # y = torch.where(mask.sum(1) > RENDER_OVERLAP_MASK_THRESHOLD, y[:, :3, :, :],
-        #                 b.unsqueeze(0)[:, :3, :, :])
-    return y.clamp(0., 1.).permute(0, 2, 3, 1)
+        if invert_colours:
+            y[:, :3, :, :] = 1.0 - y[:, :3, :, :]
+        if b is not None:
+            b = b.cuda() if x.is_cuda else b.cpu()
+            # TODO: apply background image
+            # y = torch.where(mask.sum(1) > RENDER_OVERLAP_MASK_THRESHOLD, y[:, :3, :, :],
+            #                 b.unsqueeze(0)[:, :3, :, :])
+        return y.clamp(0., 1.).permute(0, 2, 3, 1)

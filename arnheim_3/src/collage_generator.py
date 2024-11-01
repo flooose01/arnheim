@@ -194,8 +194,9 @@ class PopulationCollage(torch.nn.Module):
           self.coloured_patches, mode="normed",
           invert_colours=self.config["invert_colours"], b=background_image)
     elif self.config["render_method"] == "opacity":
-      if params.final:
-        img = rendering.population_render_overlap(self.coloured_patches,
+      if params is not None and "final" in params and params["final"]:
+        img = rendering.population_render_overlap(
+          self.coloured_patches,
           invert_colours=self.config["invert_colours"], b=background_image, final=True)
       else:
         img = rendering.population_render_overlap(
@@ -294,10 +295,17 @@ class PopulationCollage(torch.nn.Module):
               invert_colours=self.config["invert_colours"],
               b=background_image_uv)
         elif self.config["render_method"] == "opacity":
-          img_uv = rendering.population_render_overlap(
-              coloured_patches_uv,
-              invert_colours=self.config["invert_colours"],
-              b=background_image_uv)
+          if params is not None and "final" in params and params["final"]:
+            img_uv = rendering.population_render_overlap(
+                coloured_patches_uv,
+                invert_colours=self.config["invert_colours"],
+                b=background_image_uv,
+                final=True)
+          else:
+            img_uv = rendering.population_render_overlap(
+                coloured_patches_uv,
+                invert_colours=self.config["invert_colours"],
+                b=background_image_uv)
         else:
           print("Unhandled render method")
 

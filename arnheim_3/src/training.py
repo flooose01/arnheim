@@ -209,10 +209,12 @@ def create_compositional_batch(images, augment_trans, text_features):
     loss_weights.append(9 * common_weight)
     return all_img, 10, text_features, loss_weights
 
-# def final_render(generator):
-#     params = {"final": True}
-#     img = generator.forward(params)
-#     img_np = img.detach().cpu().numpy()
+def final_render(generator):
+    params = {"final": True}
+    img = generator.forward(params)
+    img_np = img.detach().cpu().numpy()
+
+    return img_np
 
 
 def evaluation(t, clip_enc, generator, augment_trans, text_features,
@@ -326,8 +328,9 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
 
     # Render the big version.
     if final_step:
+        img_np_final = final_render(generator=generator)
         show_and_save(
-            img_np, config, t=t, img_format="SHWC", show=config["gui"])
+            img_np_final, config, t=t, img_format="SHWC", show=config["gui"])
         output_dir = config["output_dir"]
         print(f"Saving model to {output_dir}...")
         torch.save(generator.state_dict(), f"{output_dir}/generator.pt")
