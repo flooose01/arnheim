@@ -194,7 +194,11 @@ class PopulationCollage(torch.nn.Module):
           self.coloured_patches, mode="normed",
           invert_colours=self.config["invert_colours"], b=background_image)
     elif self.config["render_method"] == "opacity":
-      img = rendering.population_render_overlap(
+      if params.final:
+        img = rendering.population_render_overlap(self.coloured_patches,
+          invert_colours=self.config["invert_colours"], b=background_image, final=True)
+      else:
+        img = rendering.population_render_overlap(
           self.coloured_patches,
           invert_colours=self.config["invert_colours"], b=background_image)
     else:
