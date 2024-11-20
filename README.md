@@ -45,6 +45,8 @@ Arnheim 3 [![Open In Colab](https://colab.research.google.com/assets/colab-badge
 
 Arnheim 3 Patch Maker [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/arnheim/blob/main/arnheim_3_patch_maker.ipynb)
 
+Arnheim 3 Collage [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/flooose01/arnheim/blob/main/arnheim_3.ipynb)
+
 ## Video illustration of the CLIP-CLOP Collage and Photomontage Generator (Arnheim 3)
 
 [![CLIP-CLOP Collage and Photomontage Generator](https://img.youtube.com/vi/VnO4tibP9cg/0.jpg)](https://youtu.be/VnO4tibP9cg)
