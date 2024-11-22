@@ -245,7 +245,7 @@ class CollageMaker():
 
         # Freezing the masking transformer for first pass
         print("Freezing the masking transformer for first pass")
-        self._generator.mask_transformer.requires_grad = False
+        self._generator.mask_transform.requires_grad = False
 
         while self._step < self._optim_steps:
             last_step = self._step == (self._optim_steps - 1)
@@ -266,7 +266,7 @@ class CollageMaker():
         print("Unfreezing the masking transformer for second pass")
         self._generator.spatial_transformer.requires_grad = False
         self._generator.colour_transformer.requires_grad = False
-        self._generator.mask_transformer.requires_grad = True
+        self._generator.mask_transform.requires_grad = True
 
         # TODO: second loop
 
