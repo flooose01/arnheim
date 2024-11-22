@@ -93,11 +93,11 @@ class PopulationCollage(torch.nn.Module):
 
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
         self.mask_transform = torch.nn.Parameter(torch.zeros(
-            pop_size, self._num_patches, self._canvas_height, self._canvas_width))
+            pop_size, self._num_patches, self._canvas_height, self._canvas_width)).to(self.device)
 
         # Mask: 1.0 if the patch is in that pixel, 0.0 otherwise.
         self.mask = torch.zeros(
-            pop_size, self._num_patches, self._canvas_height, self._canvas_width)
+            pop_size, self._num_patches, self._canvas_height, self._canvas_width).to(self.device)
         self.store_patches()
 
     def store_patches(self, population_idx=None):
@@ -361,3 +361,5 @@ class PopulationCollage(torch.nn.Module):
         self.colour_transformer.tensor_to(device)
         if self.patches is not None:
             self.patches = self.patches.to(device)
+
+        self.mask_transform.to(device)
