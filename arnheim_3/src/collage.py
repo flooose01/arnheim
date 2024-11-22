@@ -243,11 +243,6 @@ class CollageMaker():
                 self._video_writer = None
                 self._population_video_writer = None
 
-        # Freezing the masking transformer for first pass
-        print("Freezing the masking transformer for first pass")
-        for param in self._generator.mask_transform.parameters():
-            param.requires_grad = False
-
         while self._step < self._optim_steps:
             last_step = self._step == (self._optim_steps - 1)
             losses, losses_separated, img_batch = self._train(
@@ -267,8 +262,7 @@ class CollageMaker():
         print("Unfreezing the masking transformer for second pass")
         # self._generator.spatial_transformer.requires_grad = False
         # self._generator.colour_transformer.requires_grad = False
-        # for param in self._generator.mask_transform.parameters():
-        #     param.requires_grad = True
+        self._generator.unfreeze()
 
         # TODO: second loop
 
