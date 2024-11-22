@@ -243,6 +243,10 @@ class CollageMaker():
                 self._video_writer = None
                 self._population_video_writer = None
 
+        # Freezing the masking transformer for first pass
+        print("Freezing the masking transformer for first pass")
+        self._generator.mask_transformer.requires_grad = False
+
         while self._step < self._optim_steps:
             last_step = self._step == (self._optim_steps - 1)
             losses, losses_separated, img_batch = self._train(
@@ -256,6 +260,15 @@ class CollageMaker():
                 training.population_evolution_step(
                     self._generator, self._config, losses)
             self._step += 1
+
+        # Second loop
+        print("Freezing the affine and colour transformer for second pass")
+        print("Unfreezing the masking transformer for second pass")
+        self._generator.spatial_transformer.requires_grad = False
+        self._generator.colour_transformer.requires_grad = False
+        self._generator.mask_transformer.requires_grad = True
+
+        # TODO: second loop
 
     def high_res_render(self,
                         segmented_data_high_res,
@@ -282,7 +295,7 @@ class CollageMaker():
         params = {"gamma": gamma,
                   "max_block_size_high_res": self._config.get(
                       "max_block_size_high_res"
-                      ), "final": True}
+                  ), "final": True}
         if no_background:
             params["no_background"] = True
         with torch.no_grad():
