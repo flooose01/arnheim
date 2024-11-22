@@ -93,7 +93,7 @@ class PopulationCollage(torch.nn.Module):
 
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
         self.mask_transform = torch.nn.Parameter(torch.zeros(
-            pop_size, self._num_patches, self._canvas_height, self._canvas_width)).to(self.device)
+            pop_size, self._num_patches, self._canvas_height, self._canvas_width), requires_grad=requires_grad).to(self.device)
 
         # Mask: 1.0 if the patch is in that pixel, 0.0 otherwise.
         self.mask = torch.zeros(
@@ -200,8 +200,8 @@ class PopulationCollage(torch.nn.Module):
         masked_patches = self.patches * self.mask_transform.unsqueeze(2)
 
         # Zero out gradient where there is no patches
-        with torch.no_grad():
-            self.mask_transform.grad *= self.mask
+        # This is done after the backward pass.
+        # Look at training.py in step_optimization.
 
         shifted_patches = self.spatial_transformer(masked_patches)
         background_image = self.background_image

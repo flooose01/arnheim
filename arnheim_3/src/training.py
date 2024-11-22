@@ -209,6 +209,7 @@ def create_compositional_batch(images, augment_trans, text_features):
     loss_weights.append(9 * common_weight)
     return all_img, 10, text_features, loss_weights
 
+
 def final_render(generator):
     params = {"final": True}
     img = generator.forward(params)
@@ -320,8 +321,12 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
 
     # Backpropagate the gradients.
     loss.backward()
-    torch.nn.utils.clip_grad_norm(generator.parameters(),
-                                  config["gradient_clipping"])
+    torch.nn.utils.clip_grad_norm_(generator.parameters(),
+                                   config["gradient_clipping"])
+
+    # Zero out gradient where there is no patches
+    with torch.no_grad():
+        generator.mask_transform.grad *= generator.mask
 
     # Decay the learning rate.
     lr_scheduler.step()
