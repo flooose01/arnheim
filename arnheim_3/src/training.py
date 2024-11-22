@@ -326,7 +326,9 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
 
     # Zero out gradient where there is no patches
     with torch.no_grad():
-        generator.mask_transform.grad *= generator.mask
+        # First pass: the gradient is always none since mask_transform does not require gradients
+        if generator.mask_transform.grad is not None:
+            generator.mask_transform.grad *= generator.mask
 
     # Decay the learning rate.
     lr_scheduler.step()
