@@ -325,6 +325,7 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
                                    config["gradient_clipping"])
 
     print(generator.mask_transform.grad)
+    print(generator.spatial_transformer.translation.grad)
     
     # # Zero out gradient where there is no patches
     # with torch.no_grad():
