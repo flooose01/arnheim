@@ -324,6 +324,8 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
     torch.nn.utils.clip_grad_norm_(generator.parameters(),
                                    config["gradient_clipping"])
 
+    print(generator.mask_transform.grad)
+    
     # # Zero out gradient where there is no patches
     # with torch.no_grad():
     #     # First pass: the gradient is always none since mask_transform does not require gradients
