@@ -91,16 +91,14 @@ class PopulationCollage(torch.nn.Module):
         # Patches in low and high-res, will be initialised on demand.
         self.patches = None
 
-        # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
-        # Frozen by default
-        self.mask_transform = torch.nn.Parameter(torch.zeros(
-            pop_size, self._num_patches, self._canvas_height, self._canvas_width), requires_grad=True).to(self.device)
-
         # Mask: 1.0 if the patch is in that pixel, 0.0 otherwise.
         self.mask = torch.zeros(
             pop_size, self._num_patches, self._canvas_height, self._canvas_width).to(self.device)
         self.store_patches()
 
+        # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
+        self.mask_transform = torch.nn.Parameter(torch.tensor(self.mask, dtype=torch.float), requires_grad=requires_grad).to(device)
+        
         self.prev = None
 
     def unfreeze(self):
@@ -132,8 +130,7 @@ class PopulationCollage(torch.nn.Module):
                 patch_i_j, patch_location = self._fetch_patch(
                     i, j, self._high_res)
                 self.patches[i, j, ...] = patch_i_j
-                # self.mask_transform.data[i, j, ...] = patch_location
-                # self.mask[i, j, ...] = patch_location
+                self.mask[i, j, ...] = patch_location
 
     def _fetch_patch(self, idx_population, idx_patch, is_high_res):
         """Helper function to fetch a patch and store on the whole canvas."""
