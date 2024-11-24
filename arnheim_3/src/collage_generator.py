@@ -98,7 +98,7 @@ class PopulationCollage(torch.nn.Module):
 
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
         self.mask_transform = torch.nn.Parameter(torch.tensor(self.mask, dtype=torch.float), requires_grad=requires_grad).to(device)
-        
+        print(self.mask_transform.data.is_leaf)
         self.prev = None
 
     def unfreeze(self):
