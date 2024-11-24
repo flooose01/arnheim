@@ -204,13 +204,14 @@ class PopulationCollage(torch.nn.Module):
             self.store_patches()
 
 
-        self.mask_transform.data.clamp(min=0.0, max=1.0)
+        self.mask_transform.data = self.mask_transform.data.clamp(min=0.0, max=1.0)
         clamped = torch.where(self.mask_transform < 0.5, torch.tensor(0.0), torch.tensor(1.0))
         
         if self.prev is not None:
             are_all_equal = torch.all(torch.eq(self.prev, self.mask_transform.data))
             print(are_all_equal)
             print(self.mask_transform.grad)
+            print(self.mask_transform.is_leaf)
         
         self.prev = self.mask_transform.data
         # Apply mask.
