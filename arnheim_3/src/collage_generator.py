@@ -94,7 +94,7 @@ class PopulationCollage(torch.nn.Module):
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
         # Frozen by default
         self.mask_transform = torch.nn.Parameter(torch.zeros(
-            pop_size, self._num_patches, self._canvas_height, self._canvas_width), requires_grad=False).to(self.device)
+            pop_size, self._num_patches, self._canvas_height, self._canvas_width), requires_grad=True).to(self.device)
 
         # Mask: 1.0 if the patch is in that pixel, 0.0 otherwise.
         self.mask = torch.zeros(
@@ -104,7 +104,7 @@ class PopulationCollage(torch.nn.Module):
         self.prev = None
 
     def unfreeze(self):
-        self.mask_transform.requires_grad = True
+        #self.mask_transform.requires_grad = True
         for param in self.spatial_transformer.parameters():
             param.requires_grad = False
         for param in self.colour_transformer.parameters():
