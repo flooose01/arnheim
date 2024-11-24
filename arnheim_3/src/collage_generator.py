@@ -101,6 +101,8 @@ class PopulationCollage(torch.nn.Module):
             pop_size, self._num_patches, self._canvas_height, self._canvas_width).to(self.device)
         self.store_patches()
 
+        self.prev = None
+
     def unfreeze(self):
         self.mask_transform.requires_grad = True
         for param in self.spatial_transformer.parameters():
