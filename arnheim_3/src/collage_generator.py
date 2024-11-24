@@ -204,8 +204,10 @@ class PopulationCollage(torch.nn.Module):
         if self.patches is None:
             self.store_patches()
 
+        self.mask_transform.data.clamp(min=0.0, max=1.0)
+        clamped = torch.where(self.mask_transform < 0.5, torch.tensor(0.0), torch.tensor(1.0))
         # Apply mask.
-        masked_patches = self.patches * self.mask_transform.unsqueeze(2)
+        masked_patches = self.patches * clamped.unsqueeze(2)
 
         # Zero out gradient where there is no patches
         # This is done after the backward pass.
