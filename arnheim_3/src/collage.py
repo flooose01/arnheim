@@ -246,6 +246,7 @@ class CollageMaker():
 
         while self._step < self._optim_steps:
             # last_step = self._step == (self._optim_steps - 1)
+            last_step = False
             losses, losses_separated, img_batch = self._train(
                 step=self._step, last_step=last_step, generator=self._generator)
             self._add_video_frames(img_batch, losses)
