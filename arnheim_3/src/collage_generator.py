@@ -97,7 +97,7 @@ class PopulationCollage(torch.nn.Module):
         self.store_patches()
 
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
-        self.mask_transform = torch.nn.Parameter(self.mask.clone().detach().requires_grad_(True)).to(device)
+        self.mask_transform = torch.nn.Parameter(self.mask.clone().requires_grad_(True)).to(device)
         
         self.prev = None
 
@@ -207,12 +207,8 @@ class PopulationCollage(torch.nn.Module):
         self.mask_transform.data = self.mask_transform.data.clamp(min=0.0, max=1.0)
         clamped = torch.where(self.mask_transform.data < 0.5, torch.tensor(0.0), torch.tensor(1.0))
         
-        if self.prev is not None:
-            are_all_equal = torch.all(torch.eq(self.prev, self.mask_transform.data))
-            print(are_all_equal)
-            print(self.mask_transform.grad)
-        
-        self.prev = self.mask_transform.data
+        print(self.mask_transform.requires_grad)  
+      
         # Apply mask.
         masked_patches = self.patches * clamped.unsqueeze(2)
 

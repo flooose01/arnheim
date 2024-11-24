@@ -103,6 +103,8 @@ def make_optimizer(generator, learning_rate):
     base_params = list(map(
         lambda x: x[1], list(filter(
             lambda kv: kv[0] not in my_list, generator.named_parameters()))))
+    
+    print("base params: " + base_params)
     lr_scheduler = torch.optim.SGD([{"params": base_params},
                                     {"params": params, "lr": learning_rate}],
                                    lr=learning_rate)
@@ -325,7 +327,7 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
                                    config["gradient_clipping"])
 
     print(generator.mask_transform.grad)
-    print(generator.spatial_transformer.translation.grad)
+    # print(generator.spatial_transformer.translation.grad)
     
     # # Zero out gradient where there is no patches
     # with torch.no_grad():
