@@ -103,6 +103,10 @@ class PopulationCollage(torch.nn.Module):
 
     def unfreeze(self):
         self.mask_transform.requires_grad = True
+        for param in self.spatial_transformer.parameters():
+            param.requires_grad = False
+        for param in self.colour_transformer.parameters():
+            param.requires_grad = False
 
     def store_patches(self, population_idx=None):
         """Store the image patches for each population element."""
@@ -302,7 +306,8 @@ class PopulationCollage(torch.nn.Module):
                 # Extract full patches, apply spatial transform individually and crop.
                 shifted_patches_uv = []
                 for idx_patch in range(self._num_patches):
-                    patch = self._fetch_patch(0, idx_patch, True).unsqueeze(0)
+                    patch, location = self._fetch_patch(0, idx_patch, True)
+                    patch = patch.unsqueeze(0)
                     patch_uv = self.spatial_transformer(patch, idx_patch)
                     patch_uv = patch_uv[:, :, :, y0:y1, x0:x1]
                     shifted_patches_uv.append(patch_uv)

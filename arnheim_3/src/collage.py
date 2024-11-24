@@ -81,6 +81,7 @@ class CollageMaker():
         self._use_normalized_clip = self._config["use_normalized_clip"]
         self._use_image_augmentations = self._config["use_image_augmentations"]
         self._optim_steps = self._config["optim_steps"]
+        self._second_optim_steps = self._config["second_optim_steps"]
         self._pop_size = self._config["pop_size"]
         self._population_video = self._config["population_video"]
         self._use_evolution = self._config["pop_size"] > 1
@@ -244,27 +245,35 @@ class CollageMaker():
                 self._population_video_writer = None
 
         while self._step < self._optim_steps:
-            last_step = self._step == (self._optim_steps - 1)
+            # last_step = self._step == (self._optim_steps - 1)
             losses, losses_separated, img_batch = self._train(
                 step=self._step, last_step=last_step, generator=self._generator)
             self._add_video_frames(img_batch, losses)
             self._losses_history.append(losses)
             self._losses_separated_history.append(losses_separated)
 
-            if (self._use_evolution and self._step
-                    and self._step % self._evolution_frequency == 0):
-                training.population_evolution_step(
-                    self._generator, self._config, losses)
+            # Disabling evolution
+            # if (self._use_evolution and self._step
+            #         and self._step % self._evolution_frequency == 0):
+            #     training.population_evolution_step(
+            #         self._generator, self._config, losses)
             self._step += 1
 
         # Second loop
         print("Freezing the affine and colour transformer for second pass")
         print("Unfreezing the masking transformer for second pass")
-        # self._generator.spatial_transformer.requires_grad = False
-        # self._generator.colour_transformer.requires_grad = False
         self._generator.unfreeze()
 
-        # TODO: second loop
+        total_steps = self._optim_steps + self._second_optim_steps
+        while self._step < total_steps:
+            last_step = self._step == (total_steps - 1)
+            losses, losses_separated, img_batch = self._train(
+                step=self._step, last_step=last_step, generator=self._generator)
+            self._add_video_frames(img_batch, losses)
+            self._losses_history.append(losses)
+            self._losses_separated_history.append(losses_separated)
+
+            self._step += 1    
 
     def high_res_render(self,
                         segmented_data_high_res,
