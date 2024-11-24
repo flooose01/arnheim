@@ -213,6 +213,7 @@ class PopulationCollage(torch.nn.Module):
         if self.prev is not None:
             are_all_equal = torch.all(torch.eq(self.prev, self.mask_transform.data))
             print(are_all_equal)
+            print(self.mask_transform.grad)
         
         self.prev = self.mask_transform.data
         # Apply mask.
