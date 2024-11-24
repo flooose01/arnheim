@@ -132,8 +132,8 @@ class PopulationCollage(torch.nn.Module):
                 patch_i_j, patch_location = self._fetch_patch(
                     i, j, self._high_res)
                 self.patches[i, j, ...] = patch_i_j
-                self.mask_transform.data[i, j, ...] = patch_location
-                self.mask[i, j, ...] = patch_location
+                # self.mask_transform.data[i, j, ...] = patch_location
+                # self.mask[i, j, ...] = patch_location
 
     def _fetch_patch(self, idx_population, idx_patch, is_high_res):
         """Helper function to fetch a patch and store on the whole canvas."""
