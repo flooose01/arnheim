@@ -97,10 +97,6 @@ def make_optimizer(generator, learning_rate):
       optimizer
     """
 
-    print("Params: ", generator.named_parameters())
-    for name, param in generator.named_paramaters():
-        print(name)
-
     my_list = ["positions_top"]
     params = list(map(lambda x: x[1], list(filter(lambda kv: kv[0] in my_list,
                                                   generator.named_parameters()))))
