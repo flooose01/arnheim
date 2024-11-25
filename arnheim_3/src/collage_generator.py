@@ -214,7 +214,7 @@ class PopulationCollage(torch.nn.Module):
             torch.ones_like(self.mask_transform)
         )
         
-        print(self.spatial_transformer.reds.grad)
+        print(self.spatial_transformer.translation.grad)
 
         # Apply mask.
         masked_patches = self.patches * clamped.unsqueeze(2)
