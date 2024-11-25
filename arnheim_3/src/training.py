@@ -108,7 +108,6 @@ def make_optimizer(generator, learning_rate):
         lambda x: x[1], list(filter(
             lambda kv: kv[0] not in my_list, generator.named_parameters()))))
     
-    print("base params: " + str(base_params))
     lr_scheduler = torch.optim.SGD([{"params": base_params},
                                     {"params": params, "lr": learning_rate}],
                                    lr=learning_rate)
