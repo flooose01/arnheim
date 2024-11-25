@@ -95,17 +95,11 @@ class PopulationCollage(torch.nn.Module):
         self.mask = None
 
         self.store_patches()
-        print("Mask Type: ", type(self.mask))  # Should print <class 'torch.Tensor'>
-        print("Req grad: ", self.mask.requires_grad)
+
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
         self.mask_transform = torch.nn.Parameter(self.mask.clone().requires_grad_(True)).to(device)
         
         self.prev = None
-
-            
-        print("Params: ")
-        for name, param in self.named_paramaters():
-            print(name)
 
     def unfreeze(self):
         #self.mask_transform.requires_grad = True
@@ -213,7 +207,6 @@ class PopulationCollage(torch.nn.Module):
         if self.patches is None:
             self.store_patches()
 
-
         self.mask_transform.data.clamp_(min=0.0, max=1.0)
         clamped = torch.where(
             self.mask_transform < 0.5,
@@ -221,8 +214,8 @@ class PopulationCollage(torch.nn.Module):
             torch.ones_like(self.mask_transform)
         )
         
-        print(self.mask_transform.requires_grad)  
-      
+        print(self.spatial_transformer.reds.grad)
+
         # Apply mask.
         masked_patches = self.patches * clamped.unsqueeze(2)
 
