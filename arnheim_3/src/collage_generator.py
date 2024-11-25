@@ -102,11 +102,6 @@ class PopulationCollage(torch.nn.Module):
         
         self.prev = None
 
-            
-        print("Params: ")
-        for name, param in self.named_paramaters():
-            print(name)
-
     def unfreeze(self):
         #self.mask_transform.requires_grad = True
         for param in self.spatial_transformer.parameters():
