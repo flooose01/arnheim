@@ -97,6 +97,10 @@ def make_optimizer(generator, learning_rate):
       optimizer
     """
 
+    print("Params:")
+    for name, param in generator.named_paramaters():
+        print(name)
+
     my_list = ["positions_top"]
     params = list(map(lambda x: x[1], list(filter(lambda kv: kv[0] in my_list,
                                                   generator.named_parameters()))))
@@ -325,9 +329,6 @@ def step_optimization(t, clip_enc, lr_scheduler, generator, augment_trans,
     loss.backward()
     torch.nn.utils.clip_grad_norm_(generator.parameters(),
                                    config["gradient_clipping"])
-
-    print(generator.mask_transform.grad)
-    # print(generator.spatial_transformer.translation.grad)
     
     # # Zero out gradient where there is no patches
     # with torch.no_grad():
