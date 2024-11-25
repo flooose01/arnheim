@@ -92,8 +92,8 @@ class PopulationCollage(torch.nn.Module):
         self.patches = None
 
         # Mask: 1.0 if the patch is in that pixel, 0.0 otherwise.
-        self.mask = torch.zeros(
-            pop_size, self._num_patches, self._canvas_height, self._canvas_width).to(self.device)
+        self.mask = None
+
         self.store_patches()
 
         # Mask transformer: 1.0 if the patch is in that pixel, 0.0 otherwise. A parameter to be optimized
@@ -118,10 +118,14 @@ class PopulationCollage(torch.nn.Module):
         if population_idx is not None and self.patches is not None:
             list_indices_population = [population_idx]
             self.patches[population_idx, :, :4, :, :] = 0
+            self.mask[population_idx, :, :, :] = 0
         else:
             list_indices_population = np.arange(self._pop_size)
             self.patches = torch.zeros(
                 self._pop_size, self._num_patches, 5, self._canvas_height,
+                self._canvas_width).to(self.device)
+            self.mask = torch.zeros(
+                self._pop_size, self._num_patches, self._canvas_height, 
                 self._canvas_width).to(self.device)
 
         # Put the segmented data into the patches.
@@ -204,8 +208,12 @@ class PopulationCollage(torch.nn.Module):
             self.store_patches()
 
 
-        self.mask_transform.data = self.mask_transform.data.clamp(min=0.0, max=1.0)
-        clamped = torch.where(self.mask_transform.data < 0.5, torch.tensor(0.0), torch.tensor(1.0))
+        self.mask_transform.data.clamp_(min=0.0, max=1.0)
+        clamped = torch.where(
+            self.mask_transform < 0.5,
+            torch.zeros_like(self.mask_transform),
+            torch.ones_like(self.mask_transform)
+        )
         
         print(self.mask_transform.requires_grad)  
       

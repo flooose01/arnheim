@@ -261,20 +261,20 @@ class CollageMaker():
             self._step += 1
 
         # Second loop
-        print("Freezing the affine and colour transformer for second pass")
-        print("Unfreezing the masking transformer for second pass")
-        self._generator.unfreeze()
+        # print("Freezing the affine and colour transformer for second pass")
+        # print("Unfreezing the masking transformer for second pass")
+        # self._generator.unfreeze()
 
-        total_steps = self._optim_steps + self._second_optim_steps
-        while self._step < total_steps:
-            last_step = self._step == (total_steps - 1)
-            losses, losses_separated, img_batch = self._train(
-                step=self._step, last_step=last_step, generator=self._generator)
-            self._add_video_frames(img_batch, losses)
-            self._losses_history.append(losses)
-            self._losses_separated_history.append(losses_separated)
+        # total_steps = self._optim_steps + self._second_optim_steps
+        # while self._step < total_steps:
+        #     last_step = self._step == (total_steps - 1)
+        #     losses, losses_separated, img_batch = self._train(
+        #         step=self._step, last_step=last_step, generator=self._generator)
+        #     self._add_video_frames(img_batch, losses)
+        #     self._losses_history.append(losses)
+        #     self._losses_separated_history.append(losses_separated)
 
-            self._step += 1    
+        #     self._step += 1    
 
     def high_res_render(self,
                         segmented_data_high_res,
