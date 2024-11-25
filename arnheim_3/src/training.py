@@ -97,7 +97,7 @@ def make_optimizer(generator, learning_rate):
       optimizer
     """
 
-    print("Params:")
+    print("Params: ", generator.named_parameters())
     for name, param in generator.named_paramaters():
         print(name)
 
